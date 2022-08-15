@@ -3,6 +3,8 @@ use crate::particle::*;
 
 // resources
 #[derive(Default)]
+// TODO take out entity and add 'Selected' as a component
+// TODO track the position of clicks in a resource (rename struct)
 pub struct Selected {
   pub entity: Option<Entity>,
   pub position: Vec2,
@@ -29,6 +31,12 @@ pub fn mark (
   }
 }
 
+pub fn unmark (
+  mut commands: Commands,
+){
+  commands.remove_resource::<Selected>();
+}
+
 pub fn remove (
   mut commands: Commands,
   selected: Option<Res<Selected>>,
@@ -38,12 +46,6 @@ pub fn remove (
       commands.entity(entity).despawn();
     }
   }
-}
-
-pub fn unmark (
-  mut commands: Commands,
-){
-  commands.remove_resource::<Selected>();
 }
 
 fn collision(point: Vec2, targets: &Vec<(Entity, &Particle, &Transform)>) -> Option<Entity> {

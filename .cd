@@ -2,12 +2,12 @@
 
 function run() {
   cargo build --features bevy/dynamic
-  RUST_LOG=bevy_music=debug cargo run --features bevy/dynamic
+  RUST_LOG=phusycs=debug cargo run --features bevy/dynamic
 }
 
 function debug() {
   cargo build --features bevy/dynamic
-  RUST_BACKTRACE=1 RUST_LOG=bevy_music=debug cargo run --features bevy/dynamic
+  RUST_BACKTRACE=1 RUST_LOG=phusycs=debug cargo run --features bevy/dynamic
 }
 
 function clean() {
