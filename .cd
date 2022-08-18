@@ -15,5 +15,5 @@ function clean() {
 }
 
 info "Commands:"
-help .cd | debug indent ">"
+help .cd | indent info ">"
 todo
