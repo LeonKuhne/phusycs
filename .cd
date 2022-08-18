@@ -15,5 +15,5 @@ function clean() {
 }
 
 info "Commands:"
-help .cd | indent info ">"
+help .cd | xargs printf "%s$C_DEBUG" | indent ">"
 todo
