@@ -14,5 +14,6 @@ function clean() {
   rm -rf Cargo.lock target
 }
 
-info "Commands:\n$(help .cd | indent ">")"
+info "Commands:"
+help .cd | warn indent ">"
 todo
