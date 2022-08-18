@@ -1,18 +1,17 @@
 use bevy::prelude::*;
 use crate::particle::*;
 
-// resources
-#[derive(Default)]
-// TODO take out entity and add 'Selected' as a component
-// TODO track the position of clicks in a resource (rename struct)
-pub struct Selected {
-  pub entity: Option<Entity>,
-  pub position: Vec2,
+// resources 
+#[derive(Component)]
+pub struct Clicked {
+  pub pos: Vec2,
 }
 
 // components
 #[derive(Component)]
 pub struct Selectable;
+#[derive(Component)]
+pub struct Selected;
 
 // systems
 pub fn mark (
@@ -24,10 +23,15 @@ pub fn mark (
   // update selected
   if input.just_pressed(MouseButton::Left) {
     let pos = cursor_pos(windows.primary());
-    commands.insert_resource(Selected {
-      entity: collision(pos, &selectables.iter().collect()),
-      position: pos,
-    });
+    let entity = collision(pos, &selectables.iter().collect());
+    let component = Clicked { pos };
+    // attatch a click component
+    if let Some(entity) = entity {
+      commands.entity(entity).insert(component);
+    // spawn a click entity
+    } else {
+      commands.spawn().insert(component);
+    }
   }
 }
 
@@ -47,22 +51,3 @@ pub fn remove (
     }
   }
 }
-
-fn collision(point: Vec2, targets: &Vec<(Entity, &Particle, &Transform)>) -> Option<Entity> {
-  for (entity, particle, &target_transform) in targets.iter() {
-    let distance = (point - target_transform.translation.truncate()).length();
-    if distance < particle.radius {
-      return Some(*entity);
-    }
-  }
-  return None;
-}
-
-fn cursor_pos(window: &Window) -> Vec2 {
-  // get the clicked position
-  let mut pos = window.cursor_position().unwrap();
-  // get the position in world space
-  pos -= Vec2::new(window.width(), window.height()) / 2.;
-  return pos;
-}
-

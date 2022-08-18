@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::pbr::PbrBundle;
-use crate::select::*;
+use crate::click::{Clicked, Clickable};
+//use crate::select::*;
 
 // components
 #[derive(Component)]
@@ -14,23 +15,21 @@ pub fn spawn(
   mut commands: Commands,
   mut meshes: ResMut<Assets<Mesh>>,
   mut materials: ResMut<Assets<StandardMaterial>>,
-  selected: Option<Res<Selected>>,
+  click: Query<Option<&Clicked>>, //Without<Selected>>,
 ){
-  // enforce empty selection
-  if let Some(selected) = selected {
-    if !selected.entity.is_none() { return; }
-
+  if let Some(clicked) = click.single() {
     // spawn the note
     commands
       .spawn()
-      .insert(Selectable)
+      .insert(Clickable)
+      //.insert(Selectable)
       .insert(Particle {
         radius: 10.,
         mass: f32::INFINITY,
       })
       //.insert_bundle(PickableBundle::default())
       .insert_bundle(PbrBundle {
-        transform: Transform::from_translation(selected.position.extend(0.)),
+        transform: Transform::from_translation(clicked.pos.extend(0.)),
         mesh: meshes.add(Mesh::from(shape::Icosphere {
           radius: 10.0,
           subdivisions: 2,

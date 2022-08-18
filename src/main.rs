@@ -1,17 +1,21 @@
 use bevy::prelude::*;
-mod select;
+mod physics;
+mod click;
+//mod select;
 mod particle;
-mod configurator;
+//mod configurator;
 
 fn main() {
   App::new()
     .add_plugins(DefaultPlugins)
     .add_startup_system(camera)
-    .add_startup_system(configurator::spawn)
+    //.add_startup_system(configurator::spawn)
+    .add_system(click::listen)
     .add_system(particle::spawn)
-    .add_system(select::remove.after(particle::spawn))
-    .add_system(select::unmark.after(select::remove))
-    .add_system(select::mark.after(select::unmark))
+    .add_system(click::reset)
+    //.add_system(select::remove.after(particle::spawn))
+    //.add_system(select::unmark.after(select::remove))
+    //.add_system(select::mark.after(select::unmark))
     .run()
 }
 

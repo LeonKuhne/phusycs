@@ -5,7 +5,7 @@ function run() {
   RUST_LOG=phusycs=debug cargo run --features bevy/dynamic
 }
 
-function debug() {
+function test() {
   cargo build --features bevy/dynamic
   RUST_BACKTRACE=1 RUST_LOG=phusycs=debug cargo run --features bevy/dynamic
 }
@@ -14,4 +14,5 @@ function clean() {
   rm -rf Cargo.lock target
 }
 
-help .cd
+info "Commands:\n$(help .cd | indent ">")"
+todo
