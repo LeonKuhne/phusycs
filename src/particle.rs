@@ -15,7 +15,7 @@ pub fn spawn(
   mut commands: Commands,
   mut meshes: ResMut<Assets<Mesh>>,
   mut materials: ResMut<Assets<StandardMaterial>>,
-  click: Query<&Clicked>, //Without<Selected>>,
+  click: Query<&Clicked, Without<Particle>>,
 ){
   if let Some(clicked) = click.get_single().ok() {
     // spawn the note
@@ -44,3 +44,11 @@ pub fn spawn(
   }
 }
 
+pub fn despawn(
+  mut commands: Commands,
+  click: Query<Entity, (With<Particle>, With<Clicked>)>
+){
+  if let Some(entity) = click.get_single().ok() {
+    commands.entity(entity).despawn(); 
+  }
+}
