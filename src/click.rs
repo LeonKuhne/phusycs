@@ -11,6 +11,7 @@ pub struct Clicked {
 }
 
 // systems
+// create clicked components
 pub fn listen (
   mut commands: Commands,
   windows: Res<Windows>,
@@ -37,19 +38,21 @@ pub fn listen (
   }
 }
 
+// remove clicked components
 pub fn reset (
   mut commands: Commands,
   click: Query<(Entity, &Clicked)>,
 ) {
-  let (entity, clicked) = click.single();
 
-  // remove standalone entity
-  if clicked.standalone {
-    commands.entity(entity).despawn();
-    
-  // remove component from entity
-  } else {
-    commands.entity(entity).remove::<Clicked>();
+  if let Some((entity, clicked)) = click.get_single().ok() {
+    // remove standalone entity
+    if clicked.standalone {
+      commands.entity(entity).despawn();
+      
+    // remove component from entity
+    } else {
+      commands.entity(entity).remove::<Clicked>();
+    }
   }
 }
 

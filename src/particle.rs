@@ -15,9 +15,9 @@ pub fn spawn(
   mut commands: Commands,
   mut meshes: ResMut<Assets<Mesh>>,
   mut materials: ResMut<Assets<StandardMaterial>>,
-  click: Query<Option<&Clicked>>, //Without<Selected>>,
+  click: Query<&Clicked>, //Without<Selected>>,
 ){
-  if let Some(clicked) = click.single() {
+  if let Some(clicked) = click.get_single().ok() {
     // spawn the note
     commands
       .spawn()

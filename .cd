@@ -10,7 +10,7 @@ function test() {
   RUST_BACKTRACE=1 RUST_LOG=phusycs=debug cargo run --features bevy/dynamic
 }
 
-function clean() {
+function wipe() {
   rm -rf Cargo.lock target
 }
 
