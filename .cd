@@ -16,4 +16,4 @@ function wipe() {
 
 title "Commands:"
 help .cd | indent "$C_DEBUG>"
-todo
+cat .todo
