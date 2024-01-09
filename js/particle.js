@@ -29,10 +29,6 @@ export class Particle {
     // draw particle
     ctx.fillStyle = this.color
     ctx.fillRect(pos.x - this.size/2, pos.y - this.size/2, this.size, this.size)
-    // draw a circle around parent with this radius
-    if (this.parent) {
-      this.parent.drawRadius(ctx, this.radius, time)
-    }
   }
 
   drawRadius(ctx, radius, time) {
