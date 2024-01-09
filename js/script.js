@@ -5,7 +5,7 @@ import { Edge } from './edge.js'
 function setup() {
   let selected = null
   const phusycs = new Phusycs(120)
-  const scrollSensitivity = .0001
+  const scrollSensitivity = .001
   const scrollThreshold = 20
 
   // listen for play

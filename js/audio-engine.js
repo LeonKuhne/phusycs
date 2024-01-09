@@ -1,6 +1,6 @@
 export class AudioEngine {
 
-  constructor(sampleRate, clipDuration) {
+  constructor(clipDuration, sampleRate=48000) {
     this.sampleRate = sampleRate // samples per second
     this.downloadButton = document.getElementById('download')
     this.clipDuration = clipDuration // in ms
@@ -23,7 +23,6 @@ export class AudioEngine {
       for (const edge of edges) sample += edge.length(time)
       samples.push(sample)
     }
-
     //  find min max
     let min = Infinity
     let max = -Infinity

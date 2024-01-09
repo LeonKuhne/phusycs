@@ -3,7 +3,7 @@ import { Edge } from './edge.js'
 import { AudioEngine } from './audio-engine.js'
 
 export class Phusycs {
-  constructor(fps, sampleRate=44100) {
+  constructor(fps) {
     this.playhead = document.getElementById('playhead')
     this.canvas = document.getElementById('view')
     this.canvas.width = window.innerWidth
@@ -13,12 +13,11 @@ export class Phusycs {
     this.particles = []
     this.timestep = 0
     this.pauseTime = 0
-    this.particleSpeed = 0.0005
     this.particleSize = 20
     this.trackLength = 2000 // in ms
     this.progress = 0
 
-    this.audioEngine = new AudioEngine(sampleRate, this.trackLength)
+    this.audioEngine = new AudioEngine(this.trackLength)
     setInterval(() => this.draw(), 1000 / fps)
     this.startTime = Date.now()
   }
