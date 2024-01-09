@@ -61,6 +61,13 @@ function setup() {
     }
   })
 
+  function selectOne(particleOrEdge) {
+    if (selected) selected.deselect()
+    if (!particleOrEdge) return
+    selected = particleOrEdge
+    selected.select()
+  }
+
   // drag particle
   let dragging = null
   phusycs.canvas.addEventListener('mousedown', e => {
@@ -75,9 +82,7 @@ function setup() {
     if (!dragging) {
       const clickedEdge = phusycs.getClickedEdge(e.clientX, e.clientY)
       if (clickedEdge) {
-        selected.deselect()
-        selected = clickedEdge
-        selected.select()
+        selectOne(clickedEdge)
         return
       }
     }
@@ -85,12 +90,11 @@ function setup() {
     // reset context
     let selecting = dragging; 
     dragging = null 
-    if (selected) selected.deselect()
 
     // create edge on shift click
     if (e.shiftKey && selected instanceof Particle && selecting) {
-      selected = phusycs.connect(selected, selecting)
-      selected?.select()
+      const edge = phusycs.connect(selected, selecting)
+      selectOne(edge)
       return
     }
 
@@ -102,8 +106,7 @@ function setup() {
     }
 
     // select particle
-    selecting.select()
-    selected = selecting
+    selectOne(selecting)
   })
 
   // resize canvas
