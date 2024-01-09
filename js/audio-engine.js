@@ -24,7 +24,7 @@ export class AudioEngine {
   }
 
   sample(edges, time) {
-    console.log('sampling', edges)
+    //console.log('sampling', edges)
     // for all edges, sample the distance between the two particles
     const samples = edges.map(edge => edge.sample(time, this.sampleRate))
     // average the samples

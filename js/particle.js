@@ -14,15 +14,17 @@ export class Particle {
   at(time) {
     if (!this.parent) return this.startPos
     let pos = { ...this.parent.at(time) }
-    const angle = (this.angle + (time - this.startTime) * this.rotationSpeed)
+    const angle = this.angle + this.angleDelta(time)
     pos.x += this.radius * Math.cos(angle)
     pos.y += this.radius * Math.sin(angle)
     return pos
   }
 
+  angleDelta(time) {
+    return (time - this.startTime) * this.rotationSpeed
+  }
+
   draw(ctx, time) {
-    console.log('drawing particle', this.at(time))
-    //const pos = this.at(time)
     const pos = this.at(time)
     // draw particle
     ctx.fillStyle = this.color

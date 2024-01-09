@@ -4,13 +4,21 @@ import { Edge } from './edge.js'
 
 function setup() {
   let selected = null
-  const scrollSensitivity = .0001
   const phusycs = new Phusycs(60)
+  const scrollSensitivity = .1
+  const scrollThreshold = 20
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
-    if (!selected || !(selected instanceof Particle)) return
-    selected.rotationSpeed += e.deltaY * scrollSensitivity
+    if (!selected || !(selected instanceof Particle) || Math.abs(e.deltaY) < scrollThreshold) return
+    // adjust speed
+    const angleProgressBefore = selected.angleDelta(phusycs.timestep)
+    selected.rotationSpeed += scrollSensitivity * (e.deltaY < 0 ? 1 : -1)
+    const angleProgressAfter = selected.angleDelta(phusycs.timestep)
+    const angleDelta = angleProgressAfter - angleProgressBefore
+    selected.angle -= angleDelta
+    // adjust angle 
+    console.log('scrolling', selected.rotationSpeed, angleDelta)
   })
 
   window.addEventListener('keydown', e => {
