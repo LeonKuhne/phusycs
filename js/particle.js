@@ -1,16 +1,12 @@
 export class Particle {
   constructor(parent, x, y, size, timestep) {
     this.parent = parent
-    this.radius = parent ? parent.startDistance(x, y) : null;
-    this.angle = parent ? parent.startAngle(x, y) : null;
+    this.startPos = { x, y }
+    this.radius = parent ? Particle.distanceBetween(parent.at(timestep), this.startPos) : null;
+    this.angle = parent ? Particle.angleBetween(parent.at(timestep), this.startPos) : null;
     this.size = size
     this.rotationSpeed = 1
-    if (parent) {
-      // TODO figure out exactly where to put this
-      this.startPos = TODO
-    } else {
-      this.startPos = { x, y }
-    }
+    this.startTime = timestep
     this.deselect()
   }
 
@@ -18,7 +14,7 @@ export class Particle {
   at(time) {
     if (!this.parent) return this.startPos
     let pos = { ...this.parent.at(time) }
-    const angle = (this.angle + time)
+    const angle = (this.angle + (time - this.startTime) * this.rotationSpeed)
     pos.x += this.radius * Math.cos(angle)
     pos.y += this.radius * Math.sin(angle)
     return pos
@@ -48,10 +44,7 @@ export class Particle {
 
   select() { this.color = 'tan' }
   deselect() { this.color = 'green' }
-  startAngle(x, y) { 
-    return Math.atan2(y - this.startPos.y, x - this.startPos.x) 
-  }
-  startDistance(x, y) { return Particle.distanceBetween(this.startPos, { x, y }) }
   distanceFrom(x, y, time) { return Particle.distanceBetween(this.at(time), { x, y }) }
   static distanceBetween(a, b) { return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) }
+  static angleBetween(a, b) { return Math.atan2(b.y - a.y, b.x - a.x) }
 }

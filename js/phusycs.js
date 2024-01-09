@@ -22,6 +22,7 @@ export class Phusycs {
 
   draw() {
     const time = this.elapsed 
+    this.audioEngine.tick()
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     this.particles.forEach(particle => particle.draw(this.ctx, time))
     this.edges.forEach(edge => edge.draw(this.ctx, time))
@@ -40,8 +41,8 @@ export class Phusycs {
     }
   }
 
-  getClickedParticle(x, y, size) {
-    let minDistance = size
+  getClickedParticle(x, y) {
+    let minDistance = this.particleSize
     let closestParticle = null
     for (const particle of this.particles) {
       const distance = particle.distanceFrom(x, y, this.elapsed)
