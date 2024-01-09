@@ -1,0 +1,7 @@
+#!/bin/bash
+title "Phusycs = music + physicis"
+help .cd | indent
+
+function run() {
+  serve
+}
