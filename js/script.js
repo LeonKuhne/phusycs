@@ -17,8 +17,6 @@ function setup() {
     const angleProgressAfter = selected.angleDelta(phusycs.timestep)
     const angleDelta = angleProgressAfter - angleProgressBefore
     selected.angle -= angleDelta
-    // adjust angle 
-    console.log('scrolling', selected.rotationSpeed, angleDelta)
   })
 
   window.addEventListener('keydown', e => {

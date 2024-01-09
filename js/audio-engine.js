@@ -18,10 +18,9 @@ export class AudioEngine {
   }
 
   play() {
-    console.log('playing')
     const signal = []
     // go through every timestep in range and get the signal
-
+    // TODO
     const samples = new Float32Array(signal)
     // Create a new buffer source
     var bufferSource = this.ctx.createBufferSource()
