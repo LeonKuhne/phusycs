@@ -16,7 +16,6 @@ export class AudioEngine {
 
   readPlayhead(edges) {
     const samples = []
-    console.log("reading discs...")
     for (let i = 0; i < this.numSamples; i++) {
       const time = i / this.sampleRate * 1000
       let sample = 0
@@ -37,7 +36,6 @@ export class AudioEngine {
     for (const i in samples) {
       samples[i] = (samples[i] - min) / range
       samples[i] = samples[i] * 2 - 1
-      if (i % 1000 == 0) console.log(samples[i])
     }
     return samples
   }
