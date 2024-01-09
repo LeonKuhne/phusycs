@@ -1,11 +1,10 @@
 ### todo
-- save output to csv and analyze
-- test audio by playing edges as oscillators
+- drag on empty to select multiple
+- when scolling without any selection, increase/decrease all radii
 - add tutorial/instructions
 - show speeds of particles when paused
 - allow drag on orbiting particles to adjust orbit radius & angle
 - change timeline to slider and allow adjusting playhead
-- when scolling without any selection, increase/decrease all radii
 
 ### controls
 - *drag particle* to move if static
