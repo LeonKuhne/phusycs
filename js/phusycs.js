@@ -6,8 +6,6 @@ export class Phusycs {
   constructor(fps) {
     this.playhead = document.getElementById('playhead')
     this.canvas = document.getElementById('view')
-    this.canvas.width = window.innerWidth
-    this.canvas.height = window.innerHeight
     this.ctx = this.canvas.getContext('2d')
     this.edges = []
     this.particles = []
@@ -118,4 +116,16 @@ export class Phusycs {
     this.timestep = (Date.now() - this.startTime)
     return this.timestep 
   } 
+
+  accelParticle(particle, amount) {
+    const angleProgressBefore = particle.angleDelta(this.timestep)
+    particle.rotationSpeed = (particle.rotationSpeed * (1 + amount)) + amount
+    const angleProgressAfter = particle.angleDelta(this.timestep)
+    const angleDelta = angleProgressAfter - angleProgressBefore
+    particle.angle -= angleDelta
+  }
+
+  scaleRadii(amount) {
+    this.particles.forEach(particle => particle.radius *= amount)
+  }
 }

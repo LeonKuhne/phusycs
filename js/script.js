@@ -5,7 +5,8 @@ import { Edge } from './edge.js'
 function setup() {
   let selected = null
   const phusycs = new Phusycs(120)
-  const scrollSensitivity = .001
+  const speedSensitivity = .001
+  const scaleSensitivity = .01
   const scrollThreshold = 20
 
   // listen for play
@@ -14,16 +15,31 @@ function setup() {
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
-    if (!selected || !(selected instanceof Particle) || Math.abs(e.deltaY) < scrollThreshold) return
-    // adjust speed
-    const angleProgressBefore = selected.angleDelta(phusycs.timestep)
-    const scrollStep = scrollSensitivity * (e.deltaY < 0 ? 1 : -1)
-    selected.rotationSpeed = (selected.rotationSpeed * (1 + scrollStep)) + scrollStep
-    const angleProgressAfter = selected.angleDelta(phusycs.timestep)
-    const angleDelta = angleProgressAfter - angleProgressBefore
-    selected.angle -= angleDelta
-  })
+    if (Math.abs(e.deltaY) < scrollThreshold) return
 
+    // adjust radii
+    if (!selected) {
+      // increase all radii
+      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
+      phusycs.scaleRadii(amount)
+      return
+    }
+
+    // filter particles
+    if (!(selected instanceof Particle)) return
+
+    // adjust radius on paused
+    if (phusycs.paused) {
+      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
+      selected.radius *= amount
+      return
+    }
+
+    // adjust speed
+    const amount = speedSensitivity * (e.deltaY < 0 ? 1 : -1)
+    phusycs.accelParticle(selected, amount)
+  })
+  
   window.addEventListener('keydown', e => {
     switch(e.key) {
       // delete selected 
@@ -55,7 +71,7 @@ function setup() {
     dragging.startPos = { x: e.clientX, y: e.clientY }
   })
   phusycs.canvas.addEventListener('mouseup', e => { 
-    // check if edge clicked
+    // click edge
     if (!dragging) {
       const clickedEdge = phusycs.getClickedEdge(e.clientX, e.clientY)
       if (clickedEdge) {
@@ -89,6 +105,13 @@ function setup() {
     selecting.select()
     selected = selecting
   })
+
+  // resize canvas
+  window.addEventListener('resize', () => {
+    phusycs.canvas.width = window.innerWidth
+    phusycs.canvas.height = window.innerHeight
+  })
+  window.dispatchEvent(new Event('resize'))
 }
 
 // listen for load
