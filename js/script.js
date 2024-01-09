@@ -45,9 +45,8 @@ function setup() {
     dragging = phusycs.getClickedParticle(e.clientX, e.clientY)
   })
   phusycs.canvas.addEventListener('mousemove', e => {
-    if (!dragging || dragging.parent) return
-    dragging.x += e.clientX - dragging.x
-    dragging.y += e.clientY - dragging.y
+    if (!dragging || dragging.parent != null) return
+    dragging.startPos = { x: e.clientX, y: e.clientY }
   })
   phusycs.canvas.addEventListener('mouseup', e => { 
     // check if edge clicked
