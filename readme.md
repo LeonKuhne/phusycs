@@ -1,7 +1,11 @@
 ### todo
-- change to tick timing, see todo in phusycs.js
+- save output to csv and analyze
+- test audio by playing edges as oscillators
 - add tutorial/instructions
-- test playing edges as oscillators
+- show speeds of particles when paused
+- allow drag on orbiting particles to adjust orbit radius & angle
+- change timeline to slider and allow adjusting playhead
+- when scolling without any selection, increase/decrease all radii
 
 ### controls
 - *drag particle* to move if static

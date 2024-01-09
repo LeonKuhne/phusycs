@@ -9,13 +9,8 @@ export class Edge {
     this.deselect()
   }
 
-  sample(start, count) {
-    const result = []
-    const step = 1 / count
-    for (let i = start; i < start+count; i += step) {
-      result.push(Particle.distanceBetween(this.from.at(i), this.to.at(i)))
-    }
-    return result;
+  length(time) {
+    return Particle.distanceBetween(this.from.at(time), this.to.at(time))
   }
 
   draw(ctx, time) {
@@ -38,6 +33,6 @@ export class Edge {
     return Math.abs(A * x + B * y + C) / Math.sqrt(A * A + B * B)
   }
 
-  select() { this.color = 'tan' }
-  deselect() { this.color = 'red' }
+  select() { this.color = '#f60' }
+  deselect() { this.color = `hsl(${Math.random() * 360}, 35%, 50%)` }
 }

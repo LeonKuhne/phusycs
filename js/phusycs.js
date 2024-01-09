@@ -4,34 +4,41 @@ import { AudioEngine } from './audio-engine.js'
 
 export class Phusycs {
   constructor(fps, sampleRate=44100) {
+    this.playhead = document.getElementById('playhead')
     this.canvas = document.getElementById('view')
     this.canvas.width = window.innerWidth
     this.canvas.height = window.innerHeight
+    this.ctx = this.canvas.getContext('2d')
     this.edges = []
     this.particles = []
-    this.audioEngine = new AudioEngine(sampleRate)
-    this.ctx = this.canvas.getContext('2d')
-    setInterval(() => this.draw(), 1000 / fps)
-    this.startTime = Date.now()
     this.timestep = 0
     this.pauseTime = 0
     this.particleSpeed = 0.0005
     this.particleSize = 20
-
-    this.trackLength = 200 // in ticks
-    this.trackStep = 1 / this.trackLength
+    this.trackLength = 2000 // in ms
     this.progress = 0
+
+    this.audioEngine = new AudioEngine(sampleRate, this.trackLength)
+    setInterval(() => this.draw(), 1000 / fps)
+    this.startTime = Date.now()
   }
 
   draw() {
-    // draw audio player
-    this.progress += this.trackStep
-    if (this.progress >= 1) {
-      this.progress = 0
-      // todo reset timing to start
-      // it might be easier to change the system to use ticks instead fo timestamps, and then reset the tick back to 0
+    // update progress
+    if (!this.paused) {
+      this.progress = this.elapsed / this.trackLength
+      if (this.progress >= 1) {
+        this.progress = 0
+        this.startTime = Date.now()
+        setTimeout(() => {
+          this.audioEngine.resample(this.edges)
+          this.audioEngine.play()
+        }, 0)
+      }
     }
-    this.audioEngine.draw(this.progress)
+
+    // update timeline
+    this.playhead.style.left = `${this.progress * 100}%`
 
     // draw & edges particles
     const time = this.elapsed 
@@ -99,7 +106,9 @@ export class Phusycs {
 
   disconnect(particleOrEdge) {
     if (particleOrEdge instanceof Particle) {
-      this.particles = this.particles.filter(particle => particle !== particleOrEdge)
+      const toRemove = particleOrEdge.allChildren().concat(particleOrEdge)
+      this.particles = this.particles.filter(particle => !toRemove.includes(particle))
+      this.edges = this.edges.filter(edge => !toRemove.includes(edge.from) && !toRemove.includes(edge.to))
       return
     }
     this.edges = this.edges.filter(edge => edge !== particleOrEdge)
@@ -107,7 +116,7 @@ export class Phusycs {
 
   get elapsed() { 
     if (this.paused) return this.timestep
-    this.timestep = (Date.now() - this.startTime) * this.particleSpeed
+    this.timestep = (Date.now() - this.startTime)
     return this.timestep 
   } 
 }

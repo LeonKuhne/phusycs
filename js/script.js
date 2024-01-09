@@ -4,16 +4,21 @@ import { Edge } from './edge.js'
 
 function setup() {
   let selected = null
-  const phusycs = new Phusycs(60)
-  const scrollSensitivity = .1
+  const phusycs = new Phusycs(120)
+  const scrollSensitivity = .0001
   const scrollThreshold = 20
+
+  // listen for play
+  document.getElementById('play').addEventListener('click', () => phusycs.audioEngine.play(phusycs.edges))
+  document.getElementById('download').addEventListener('click', () => phusycs.audioEngine.download(phusycs.edges))
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
     if (!selected || !(selected instanceof Particle) || Math.abs(e.deltaY) < scrollThreshold) return
     // adjust speed
     const angleProgressBefore = selected.angleDelta(phusycs.timestep)
-    selected.rotationSpeed += scrollSensitivity * (e.deltaY < 0 ? 1 : -1)
+    const scrollStep = scrollSensitivity * (e.deltaY < 0 ? 1 : -1)
+    selected.rotationSpeed = (selected.rotationSpeed * (1 + scrollStep)) + scrollStep
     const angleProgressAfter = selected.angleDelta(phusycs.timestep)
     const angleDelta = angleProgressAfter - angleProgressBefore
     selected.angle -= angleDelta
@@ -23,7 +28,10 @@ function setup() {
     switch(e.key) {
       // delete selected 
       case 'Backspace':
-        if (selected) phusycs.disconnect(selected)
+        if (selected) {
+          phusycs.disconnect(selected)
+          selected = null
+        }
         break
       // toggle pause
       case ' ':

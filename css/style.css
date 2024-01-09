@@ -15,7 +15,7 @@
   padding: 5px 2rem;
   display: flex;
   gap: 2rem;
-} #play {
+} #play, #download {
   padding: 1rem; 
   cursor: pointer;
 } #play::before {
@@ -35,4 +35,8 @@
   width: 1rem;
   transform: translate(-50%, -50%);
   background: #fff;
+} #download::before {
+  content: "▼";
+  color: white;
+  font-size: 20px;
 }
