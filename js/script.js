@@ -19,6 +19,7 @@ function setup() {
   function deselectAll() {
     for (const particle of selected) particle.deselect()
     selected = []
+    selecting = []
   }
 
   function select(...selection) {
@@ -81,6 +82,7 @@ function setup() {
       case 'Backspace':
         for (const particle of selected) phusycs.disconnect(particle)
         selected = []
+        deselectAll()
         break
       // toggle pause
       case ' ':
