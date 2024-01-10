@@ -2,11 +2,16 @@ import { Phusycs } from './phusycs.js'
 import { Particle } from './particle.js'
 
 function setup() {
-  let selected = []
   const phusycs = new Phusycs(120)
   const speedSensitivity = .001
   const scaleSensitivity = .01
   const scrollThreshold = 20
+  let selected = []
+  let selecting = []
+  let dragStart = null
+  let dragEnd = null
+  let dragging = false
+
 
   // 
   // helpers
@@ -16,8 +21,22 @@ function setup() {
     selected = []
   }
 
-  // listen for play
-  document.getElementById('play').addEventListener('click', () => phusycs.audioEngine.play(phusycs.edges))
+  function select(...selection) {
+    deselectAll()
+    if (!selection.length) return
+    for (const particle of selection) particle.select()
+    selected = selection
+    selection = []
+    dragStart = null
+    dragEnd = null
+    dragging = false
+  }
+
+
+  //
+  // listeners
+
+  // trigger download
   document.getElementById('download').addEventListener('click', () => phusycs.audioEngine.download(phusycs.edges))
 
   // listen for scroll
@@ -32,26 +51,28 @@ function setup() {
       return
     }
 
-    // filter for one particle
-    if (selected.length > 1 || !(selected[0] instanceof Particle)) return
+    // filter particles
+    const selectedParticles = selected.filter(particle => particle instanceof Particle)
+    if (!selectedParticles.length) return
 
     // increase node tree radius
-    if (!selected[0].parent) {
+    const roots = selectedParticles.filter(particle => !particle.parent)
+    if (roots.length) {
       const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
-      phusycs.scaleRoot(selected[0], amount)
+      for (const root of roots) phusycs.scaleRoot(root, amount)
       return
     }
 
     // adjust radius on paused
     if (phusycs.paused) {
       const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
-      selected[0].radius *= amount
+      for (const particle of selectedParticles) particle.radius *= amount
       return
     }
 
     // adjust speed
     const amount = speedSensitivity * (e.deltaY < 0 ? 1 : -1)
-    phusycs.accelParticle(selected[0], amount)
+    for (const particle of selectedParticles) phusycs.accelParticle(particle, amount)
   })
   
   window.addEventListener('keydown', e => {
@@ -72,56 +93,72 @@ function setup() {
     }
   })
 
-  function select(...selecting) {
-    deselectAll()
-    if (!selecting.length) return
-    for (const particle of selecting) particle.select()
-    selected = selecting
-  }
-
-  // drag particle
-  let dragging = null
   phusycs.canvas.addEventListener('mousedown', e => {
-    dragging = phusycs.getClickedParticle(e.clientX, e.clientY)
-  })
-  phusycs.canvas.addEventListener('mousemove', e => {
-    if (!dragging || dragging.parent != null) return
-    dragging.startPos = { x: e.clientX, y: e.clientY }
-    // todo select multiple here
-  })
-  phusycs.canvas.addEventListener('mouseup', e => { 
-    // click edge
-    if (!dragging) {
-      const clickedEdge = phusycs.getClickedEdge(e.clientX, e.clientY)
-      if (clickedEdge) {
-        select(clickedEdge)
-        return
-      }
+    dragStart = { x: e.clientX, y: e.clientY }
+    dragEnd = { x: e.clientX, y: e.clientY }
+    const particle = phusycs.getClickedParticle(e.clientX, e.clientY)
+    if (particle) {
+      dragging = true;
+      selecting = [particle]
     }
+  })
 
-    // reset context
-    let selecting = dragging; 
-    dragging = null 
+  phusycs.canvas.addEventListener('mousemove', e => {
+    if (!dragStart) return
+    const dragFrom = { ...dragEnd }
+    dragEnd = { x: e.clientX, y: e.clientY }
 
-    // filter single selections
-    if (selected.length > 1) return;
-
-    // create edge on shift click
-    if (e.shiftKey && selected[0] instanceof Particle && selecting) {
-      const edge = phusycs.connect(selected[0], selecting)
-      select(edge)
+    // select box 
+    if (!dragging) {
+      selecting = phusycs.inBox(dragStart, dragEnd)
+      // draw selection box
+      const ctx = phusycs.canvas.getContext('2d')
+      ctx.strokeStyle = '#666'
+      ctx.lineWidth = 1
+      ctx.strokeRect(dragStart.x, dragStart.y, e.clientX - dragStart.x, e.clientY - dragStart.y)
       return
     }
 
-    // add new particle
-    if (!selecting) { 
-      parent = selected[0] instanceof Particle ? selected[0] : null
-      selecting = phusycs.addParticle(parent, e.clientX, e.clientY)
-      phusycs.particles.push(selecting)
+    // drag roots
+    const roots = selected.filter(particle => !particle.parent)
+    if (!roots.length) return
+    const dragDelta = { x: dragEnd.x - dragFrom.x, y: dragEnd.y - dragFrom.y}
+    for (const particle of roots) {
+      particle.startPos.x += dragDelta.x
+      particle.startPos.y += dragDelta.y
+    } 
+  })
+
+  phusycs.canvas.addEventListener('mouseup', e => { 
+    switch(selecting.length) {
+
+      // no selection
+      case 0:
+        // click edge
+        const clickedEdge = phusycs.getClickedEdge(e.clientX, e.clientY)
+        if (clickedEdge) {
+          select(clickedEdge)
+          return
+        }
+        // add particle
+        parent = selected[0] instanceof Particle ? selected[0] : null
+        const particle = phusycs.addParticle(parent, e.clientX, e.clientY)
+        select(particle)
+        return;
+      
+      // one selection
+      case 1:
+        // create edge 
+        if (e.shiftKey && selected.length === 1 && selected[0] instanceof Particle && selecting.length) {
+          const edge = phusycs.connect(selected[0], selecting[0])
+          select(edge)
+          return
+        }
+        break;
     }
 
     // select particle
-    select(selecting)
+    select(...selecting)
   })
 
   // resize canvas

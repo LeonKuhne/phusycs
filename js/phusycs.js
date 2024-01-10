@@ -9,7 +9,7 @@ export class Phusycs {
     this.ctx = this.canvas.getContext('2d')
     this.edges = []
     this.particles = []
-    this.timestep = 0
+    this.elapsed = 0
     this.pauseTime = 0
     this.particleSize = 20
     this.trackLength = 2000 // in ms
@@ -23,6 +23,7 @@ export class Phusycs {
   draw() {
     // update progress
     if (!this.paused) {
+      this.stepTime()
       this.progress = this.elapsed / this.trackLength
       if (this.progress >= 1) {
         this.progress = 0
@@ -37,8 +38,8 @@ export class Phusycs {
     // update timeline
     this.playhead.style.left = `${this.progress * 100}%`
 
-    // draw & edges particles
-    const time = this.elapsed 
+    // draw particle & edges
+    const time = this.elapsed
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     this.particles.forEach(particle => particle.parent?.drawRadius(this.ctx, particle.radius, time))
     this.edges.forEach(edge => edge.draw(this.ctx, time))
@@ -85,7 +86,9 @@ export class Phusycs {
   }
 
   addParticle(parent, x, y) {
-    return new Particle(parent, x, y, this.particleSize, this.elapsed)
+    const particle = new Particle(parent, x, y, this.particleSize, this.elapsed)
+    this.particles.push(particle)
+    return particle
   }
 
   connect(from, to) {
@@ -111,16 +114,15 @@ export class Phusycs {
     this.edges = this.edges.filter(edge => edge !== particleOrEdge)
   }
 
-  get elapsed() { 
-    if (this.paused) return this.timestep
-    this.timestep = (Date.now() - this.startTime)
-    return this.timestep 
+  stepTime() { 
+    if (this.paused) return this.elapsed
+    this.elapsed = (Date.now() - this.startTime)
   } 
 
   accelParticle(particle, amount) {
-    const angleProgressBefore = particle.angleDelta(this.timestep)
+    const angleProgressBefore = particle.angleDelta(this.elapsed)
     particle.rotationSpeed = (particle.rotationSpeed * (1 + amount)) + amount
-    const angleProgressAfter = particle.angleDelta(this.timestep)
+    const angleProgressAfter = particle.angleDelta(this.elapsed)
     const angleDelta = angleProgressAfter - angleProgressBefore
     particle.angle -= angleDelta
   }
@@ -134,5 +136,20 @@ export class Phusycs {
       particle.radius *= amount
       particle.angle *= amount
     }
+  }
+
+  inBox(startPos, endPos) {
+    const x = Math.min(startPos.x, endPos.x)
+    const y = Math.min(startPos.y, endPos.y)
+    const width = Math.abs(startPos.x - endPos.x)
+    const height = Math.abs(startPos.y - endPos.y)
+    const box = { x, y, width, height }
+    return this.particles.filter(particle => this.isInBox(particle, box))
+  }
+
+  isInBox(particle, box) {
+    const { x, y, width, height } = box
+    const { x: px, y: py } = particle.at(this.elapsed)
+    return px > x && px < x + width && py > y && py < y + height
   }
 }

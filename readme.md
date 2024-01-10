@@ -12,4 +12,5 @@
 - *scroll* to zoom
 - *scroll selected* to accelerate particles orbit
 - *scroll selected while paused* to scale particles orbit
+- *scroll selected root* to scale orbits in system
 - *space* to pause
