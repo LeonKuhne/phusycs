@@ -128,4 +128,11 @@ export class Phusycs {
   scaleRadii(amount) {
     this.particles.forEach(particle => particle.radius *= amount)
   }
+
+  scaleRoot(root, amount) {
+    for (const particle of root.allChildren()) {
+      particle.radius *= amount
+      particle.angle *= amount
+    }
+  }
 }
