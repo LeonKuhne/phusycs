@@ -1,5 +1,6 @@
 import { Phusycs } from './phusycs.js'
 import { Particle } from './particle.js'
+import { Edge } from './edge.js'
 
 function setup() {
   const phusycs = new Phusycs(120)
@@ -36,8 +37,10 @@ function setup() {
   // listeners
 
   // trigger download
+  document.getElementById('play').addEventListener('click', () => phusycs.togglePause())
   document.getElementById('download').addEventListener('click', () => phusycs.audioEngine.download(phusycs.edges))
   document.getElementById('help').addEventListener('click', () => document.getElementById('instructions').classList.toggle('show'))
+  document.getElementById('instructions').addEventListener('click', () => document.getElementById('instructions').classList.remove('show'))
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
@@ -90,6 +93,20 @@ function setup() {
       // deselect
       case 'Escape':
         deselectAll()
+        break
+      // mute selected
+      case 'm':
+        for (const edge of selected.filter(edge => edge instanceof Edge)) {
+          edge.muted = !edge.muted
+          if (edge.muted) edge.solo = false
+        }
+        break
+      // solo selected
+      case 's':
+        for (const edge of selected.filter(edge => edge instanceof Edge)) {
+          edge.solo = !edge.solo
+          if (edge.solo) edge.muted = false
+        }
         break
     }
   })

@@ -15,6 +15,12 @@ export class AudioEngine {
   }
 
   readPlayhead(edges) {
+    // filter out muted
+    edges = edges.filter(edge => !edge.muted && !edge.solo)
+    // select solo'd edges
+    const solo = edges.filter(edge => edge.solo)
+    if (solo.length) edges = solo
+    // sample edges
     const samples = []
     for (let i = 0; i < this.numSamples; i++) {
       const time = i / this.sampleRate * 1000

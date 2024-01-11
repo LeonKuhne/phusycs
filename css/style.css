@@ -1,3 +1,7 @@
+:root {
+  --helpColor: #b57e5c;
+}
+
 #view {
   position: absolute;
   width: 100%;
@@ -15,8 +19,6 @@
   padding: 5px 2rem;
   display: flex;
   color: white;
-} #help {
-  color: #fcc;
 } #play, #download, #help {
   padding: 1rem; 
   cursor: pointer;
@@ -26,9 +28,9 @@
   /* center text */
   text-align: center;
 } #play::before {
-  content: "►";
-} #play.paused::before {
   content: "❚❚";
+} #play.paused::before {
+  content: "►";
 } #line {
   flex: 1;
   height: 0;
@@ -48,12 +50,14 @@
   left: 50%;
   transform: translate(-50%, -50%);
   user-select: none;
-  border: 1px solid #fcc;
+  border: 1px solid var(--helpColor);
   border-radius: 1.5rem;
   padding: 0.75rem 2.25rem;
   opacity: 0;
   display: none;
   background: #000d;
+  color: var(--helpColor);
+} #instructions strong {
   color: #dcc;
 } .show {
   animation: fadeOut 0.25s ease-in-out forwards;

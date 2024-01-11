@@ -76,7 +76,7 @@ export class Phusycs {
   }
 
   getClickedEdge(x, y) {
-    let minDistance = Edge.size
+    let minDistance = Edge.SIZE
     let closestEdge = null
     for (const edge of this.edges) {
       const distance = edge.distanceFrom(x, y, this.elapsed)
