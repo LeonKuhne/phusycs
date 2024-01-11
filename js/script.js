@@ -1,11 +1,13 @@
 import { Phusycs } from './phusycs.js'
 import { Particle } from './particle.js'
 import { Edge } from './edge.js'
+import { MathMenu } from './math-menu.js'
 
 function setup() {
   const instructions = document.getElementById('instructions')
   const helpButton = document.getElementById('help')
   const tripButton = document.getElementById('trip')
+  const mathMenu = new MathMenu(document.getElementById('math-menu'))
 
   const phusycs = new Phusycs(120)
   const speedSensitivity = .001
@@ -36,6 +38,19 @@ function setup() {
     dragStart = null
     dragEnd = null
     dragging = false
+  }
+
+  function connectedParticles() {
+    return selected.reduce((acc, particleOrEdge) => {
+      const addIfMissing = particle => {
+        if (!acc.includes(particle)) acc.push(particle)
+      }
+      if (particleOrEdge instanceof Edge) {
+        addIfMissing(particleOrEdge.from)
+        addIfMissing(particleOrEdge.to)
+      } else addIfMissing(particleOrEdge)
+      return acc
+    }, [])
   }
 
   //
@@ -78,13 +93,7 @@ function setup() {
     }
 
     // filter particles
-    const selectedParticles = selected.reduce((acc, particleOrEdge) => {
-      if (particleOrEdge instanceof Edge) {
-        acc.push(particleOrEdge.from)
-        acc.push(particleOrEdge.to)
-      } else acc.push(particleOrEdge)
-      return acc
-    }, [])
+    const selectedParticles = connectedParticles(selected) 
     if (!selectedParticles.length) return
 
     // increase node tree radius
@@ -111,6 +120,7 @@ function setup() {
     switch(e.key) {
       // delete selected 
       case 'Backspace':
+        if (mathMenu.visible) return
         for (const particle of selected) phusycs.disconnect(particle)
         selected = []
         deselectAll()
@@ -121,6 +131,7 @@ function setup() {
         break
       // deselect
       case 'Escape':
+        if (mathMenu.visible) { mathMenu.hide(); return }
         deselectAll()
         break
       // mute selected
@@ -134,9 +145,30 @@ function setup() {
       case 's':
         for (const edge of selected.filter(edge => edge instanceof Edge)) {
           edge.solo = !edge.solo
-          if (edge.solo) edge.muted = false
+          if (edge.solo) edge.muted = false 
         }
         break
+      case 'a':
+        select(...phusycs.particles)
+        break
+      case '=':
+      case '+':
+      case '-':
+      case '*':
+      case '/':
+      case '^':
+        if (!selected.length || mathMenu.visible) return
+        mathMenu.show(e.key)
+        e.preventDefault()
+        break;
+      case 'Enter':
+        // submit equation
+        if (!mathMenu.visible) return
+        mathMenu.hide()
+        for (const particle of connectedParticles()) {
+          mathMenu.applyMath(particle)
+        }
+        break;
     }
   })
 

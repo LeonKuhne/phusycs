@@ -66,6 +66,12 @@ export class Particle {
     return mass
   }
 
+  depth() {
+    let depth = 0
+    if (this.parent) depth = this.parent.depth() + 1
+    return depth
+  }
+
   select() { this.color = '#f60' }
   deselect() { this.color = `hsl(${Math.random() * 360}, 35%, 50%)` }
   distanceFrom(x, y, time) { return Particle.distanceBetween(this.at(time), { x, y }) }

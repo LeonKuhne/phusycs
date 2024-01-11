@@ -65,6 +65,21 @@
   color: var(--helpColor);
 } #instructions strong {
   color: #dcc;
+} #math-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 1.5rem;
+  width: 0;
+  transform: translate(-50%, -50%);
+  display: none;
+  font-family: monospace;
+  color: white;
+  background: #000d;
+  border: none;
+  border-bottom: 1px solid #666;
+  border-radius: 5px;
+  outline: none !important;
 } .show {
   animation: fadeOut 0.25s ease-in-out forwards;
   opacity: 1;

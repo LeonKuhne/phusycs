@@ -1,6 +1,6 @@
 ### todo
-- show speeds of particles when paused
-- type in particle speed on pause
+- adjust particle speed with math
+- press 'c' to connect selected particles edges and 'd' to disconnect, instead of shift clicking
 - add timescale to view (put dropdown on timeline)
 - allow drag on orbiting particles to adjust orbit radius & angle
 - buffer clips like normal to allow longer playback

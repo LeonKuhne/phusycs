@@ -17,7 +17,6 @@ export class Phusycs {
     this.progress = 0
     this.clearScreen = true
     this.lineColor = '#666'
-
     this.audioEngine = new AudioEngine(this.trackLength)
     setInterval(() => this.draw(), 1000 / fps)
     this.startTime = Date.now()
@@ -37,10 +36,8 @@ export class Phusycs {
         }, 0)
       }
     }
-
     // update timeline
     this.playhead.style.left = `${this.progress * 100}%`
-
     // draw particle & edges
     const time = this.elapsed
     if (this.clearScreen) this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
