@@ -7,7 +7,7 @@ export class Particle {
     this.radius = parent ? Particle.distanceBetween(parent.at(timestep), this.startPos) : null;
     this.angle = parent ? Particle.angleBetween(parent.at(timestep), this.startPos) : null;
     this.size = size
-    this.rotationSpeed = 0.0001
+    this.rotationSpeed = 0
     this.startTime = timestep
     this.deselect()
   }
@@ -31,11 +31,15 @@ export class Particle {
     // if no parrent draw border
     if (!this.parent) {
       ctx.fillStyle = '#fff'
-      ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size)
+      ctx.beginPath()
+      ctx.arc(pos.x, pos.y, size/2, 0, 2 * Math.PI)
+      ctx.fill()
       size -= 2
     }
     ctx.fillStyle = this.color
-    ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size)
+    ctx.beginPath()
+    ctx.arc(pos.x, pos.y, size/2, 0, 2 * Math.PI)
+    ctx.fill()
   }
 
   drawPaused(ctx, time) {

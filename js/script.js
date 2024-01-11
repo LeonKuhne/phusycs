@@ -10,9 +10,9 @@ function setup() {
   const mathMenu = new MathMenu(document.getElementById('math-menu'))
 
   const phusycs = new Phusycs(60)
-  const speedSensitivity = .001
+  const speedSensitivity = .0001
   const scaleSensitivity = .01
-  const scrollThreshold = 20
+  const scrollThreshold = 1
   const minDragDistance = 20
 
   let selected = []
@@ -84,6 +84,8 @@ function setup() {
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
+    e.preventDefault()
+    e.stopPropagation()
     if (Math.abs(e.deltaY) < scrollThreshold) return
 
     // adjust radii
@@ -117,6 +119,9 @@ function setup() {
     const amount = speedSensitivity * (e.deltaY < 0 ? 1 : -1)
     for (const particle of selectedParticles) phusycs.accelParticle(particle, amount)
   })
+
+  //
+  // keyboard input
   
   window.addEventListener('keydown', e => {
     switch(e.key) {
@@ -185,14 +190,15 @@ function setup() {
         break;
       case 'Enter':
         // submit equation
-        if (!mathMenu.visible) return
+        if (!mathMenu.visible || !mathMenu.isReady()) return
         mathMenu.hide()
-        for (const particle of connectedParticles()) {
-          mathMenu.applyMath(particle)
-        }
+        for (const particle of connectedParticles()) mathMenu.applyMath(particle)
         break;
     }
   })
+
+  //
+  // mouse input
 
   phusycs.canvas.addEventListener('mousedown', e => {
     // capture drag
@@ -211,10 +217,16 @@ function setup() {
   })
 
   phusycs.canvas.addEventListener('mousemove', e => {
-    // drag
     if (!dragStart) return
     const dragFrom = { ...dragEnd }
     dragEnd = { x: e.clientX, y: e.clientY }
+
+    // drag view
+    if (e.ctrlKey || e.metaKey) {
+      phusycs.panView({ x: dragEnd.x - dragFrom.x, y: dragEnd.y - dragFrom.y})
+      return
+    }
+
 
     // select box 
     if (!dragging) {

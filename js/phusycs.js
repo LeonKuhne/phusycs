@@ -58,6 +58,13 @@ export class Phusycs {
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
   }
 
+  panView(delta) {
+    this.particles.forEach(particle => {
+      particle.startPos.x += delta.x
+      particle.startPos.y += delta.y
+    })
+  }
+
   get paused() { return this.pauseTime !== 0 }
 
   togglePause() { 

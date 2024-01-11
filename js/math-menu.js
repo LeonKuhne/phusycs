@@ -58,6 +58,11 @@ export class MathMenu {
     this.elem.style.width = `${this.elem.value.length}ch`
   }
 
+  isReady() {
+    // check if the formula ends with an operator
+    return !this.operators.includes(this.equation[this.equation.length - 1])
+  }
+
   applyMath(particle) {
     let statement = this.equation.startsWith('=') ? this.equation.slice(1) : `${particle.rotationSpeed}${this.equation}`
     // replace special chars
