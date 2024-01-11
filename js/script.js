@@ -9,10 +9,12 @@ function setup() {
   const tripButton = document.getElementById('trip')
   const mathMenu = new MathMenu(document.getElementById('math-menu'))
 
-  const phusycs = new Phusycs(120)
+  const phusycs = new Phusycs(60)
   const speedSensitivity = .001
   const scaleSensitivity = .01
   const scrollThreshold = 20
+  const minDragDistance = 20
+
   let selected = []
   let selecting = []
   let dragStart = null
@@ -121,7 +123,7 @@ function setup() {
       // delete selected 
       case 'Backspace':
         if (mathMenu.visible) return
-        for (const particle of selected) phusycs.disconnect(particle)
+        for (const entry of selected) phusycs.disconnect(entry)
         selected = []
         deselectAll()
         break
@@ -151,6 +153,26 @@ function setup() {
       case 'a':
         select(...phusycs.particles)
         break
+      case 'c':
+        if (selected.length < 2) return
+        // connect selected particles
+        const selectedParticles = connectedParticles(selected)
+        for (const from of selectedParticles) {
+          for (const to of selectedParticles) {
+            if (from === to) continue
+            phusycs.connect(from, to)
+          }
+        }
+        break
+      case 'd':
+        // disconnect edges between selected particles
+        for (const from of connectedParticles()) {
+          for (const to of connectedParticles()) {
+            if (from === to) continue
+            phusycs.disconnectPath(from, to)
+          }
+        }
+        break
       case '=':
       case '+':
       case '-':
@@ -176,11 +198,16 @@ function setup() {
     // capture drag
     dragStart = { x: e.clientX, y: e.clientY }
     dragEnd = { x: e.clientX, y: e.clientY }
+    // select particle
     const particle = phusycs.getClickedParticle(e.clientX, e.clientY)
     if (particle) {
       dragging = true;
       selecting = [particle]
+      return
     }
+    // select edge
+    const edge = phusycs.getClickedEdge(e.clientX, e.clientY)
+    if (edge) selecting = [edge]
   })
 
   phusycs.canvas.addEventListener('mousemove', e => {
@@ -201,7 +228,7 @@ function setup() {
     }
 
     // drag roots
-    const roots = selecting.filter(particle => !particle.parent)
+    const roots = selecting.filter(particle => particle instanceof Particle && !particle.parent)
     if (!roots.length) return
     const dragDelta = { x: dragEnd.x - dragFrom.x, y: dragEnd.y - dragFrom.y}
     for (const particle of roots) {
@@ -211,34 +238,22 @@ function setup() {
   })
 
   phusycs.canvas.addEventListener('mouseup', e => { 
-    switch(selecting.length) {
-
-      // no selection
-      case 0:
-        // click edge
-        const clickedEdge = phusycs.getClickedEdge(e.clientX, e.clientY)
-        if (clickedEdge) {
-          select(clickedEdge)
-          return
-        }
-        // add particle
-        parent = selected[0] instanceof Particle ? selected[0] : null
-        const particle = phusycs.addParticle(parent, e.clientX, e.clientY)
-        select(particle)
-        return;
-      
-      // one selection
-      case 1:
-        // create edge 
-        if (e.shiftKey && selected.length === 1 && selected[0] instanceof Particle && selecting.length) {
-          const edge = phusycs.connect(selected[0], selecting[0])
-          select(edge)
-          return
-        }
-        break;
+    // add particle
+    const dragDistance = Particle.distanceBetween(dragStart, dragEnd)
+    if (!selecting.length && dragDistance < minDragDistance) {
+      parent = selected[0] instanceof Particle ? selected[0] : null
+      const particle = phusycs.addParticle(parent, e.clientX, e.clientY)
+      select(particle)
+      return;
     }
 
     // select particle
+    if (e.shiftKey) {
+      const toRemove = selected.filter(entry => selecting.includes(entry))
+      selecting = selected
+        .concat(selecting)
+        .filter(entry => !toRemove.includes(entry))
+    }
     select(...selecting)
   })
 

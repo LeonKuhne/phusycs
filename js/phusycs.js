@@ -100,16 +100,8 @@ export class Phusycs {
   }
 
   connect(from, to) {
+    if (this.findEdge(from, to)) return
     const edge = new Edge(from, to)
-    // disconnect existing
-    const existing = this.edges.find(edge => {
-      return edge.from === from && edge.to === to || edge.from === to && edge.to === from
-    })
-    if (existing) {
-      this.disconnect(existing)
-      return null
-    }
-    // connect new
     this.edges.push(edge)
     return edge
   }
@@ -121,7 +113,23 @@ export class Phusycs {
       this.edges = this.edges.filter(edge => !toRemove.includes(edge.from) && !toRemove.includes(edge.to))
       return
     }
-    this.edges = this.edges.filter(edge => edge !== particleOrEdge)
+    this.disconnectPath(particleOrEdge.from, particleOrEdge.to)
+  }
+
+  disconnectPath(from, to) {
+    this.edges = this.edges.filter(edge => !this.equalsEdgePath(edge, from, to))
+  }
+
+  equalsEdge(a, b) {
+    return this.equalsEdgePath(a, b.from, b.to)
+  }
+
+  equalsEdgePath(edge, from, to) {
+    return edge.from === from && edge.to === to || edge.from === to && edge.to === from
+  }
+
+  findEdge(from, to) {
+    return this.edges.find(edge => this.equalsEdgePath(edge, from, to))
   }
 
   stepTime() { 
