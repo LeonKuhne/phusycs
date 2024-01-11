@@ -171,24 +171,27 @@ function setup() {
         break
       // mute selected
       case 'm':
+      case 'M':
         for (const edge of connectedEdges()) {
-          console.log("muted edge")
           edge.muted = !edge.muted
           if (edge.muted) edge.solo = false
         }
         break
       // solo selected
       case 's':
+      case 'S':
         for (const edge of connectedEdges()) {
           edge.solo = !edge.solo
           if (edge.solo) edge.muted = false 
         }
         break
       case 'a':
+      case 'A':
         select(...phusycs.particles)
         break
       // connect selected particles
       case 'c':
+      case 'C':
         if (selected.length < 2) return
         const selectedParticles = connectedParticles(selected)
         for (const from of selectedParticles) {
@@ -200,6 +203,7 @@ function setup() {
         break
       // disconnect edges between selected particles
       case 'd':
+      case 'D':
         for (const from of connectedParticles()) {
           for (const to of connectedParticles()) {
             if (from === to) continue

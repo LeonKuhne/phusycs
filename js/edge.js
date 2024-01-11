@@ -5,6 +5,7 @@ export class Edge {
   static MUTE_COLOR = '#a00'
   static SELECT_COLOR = '#f60'
   static SIZE = 10
+  static BORDER_SIZE = 7
 
   constructor(from, to) {
     this.from = from
@@ -24,10 +25,12 @@ export class Edge {
     const startPos = this.from.at(time)
     const endPos = this.to.at(time)
     // draw selected and solo/muted 
+    let edgeSize = Edge.SIZE
     if (this.selected && (this.solo || this.muted)) {
-      Edge.drawLine(ctx, startPos, endPos, Edge.SIZE + 2, this.color())
+      Edge.drawLine(ctx, startPos, endPos, edgeSize, this.color())
+      edgeSize -= Edge.BORDER_SIZE
     }
-    Edge.drawLine(ctx, startPos, endPos, Edge.SIZE, this.selected ? Edge.SELECT_COLOR : this.color())
+    Edge.drawLine(ctx, startPos, endPos, edgeSize, this.selected ? Edge.SELECT_COLOR : this.color())
   }
 
   static drawLine(ctx, start, end, size, color=this.color()) {
