@@ -12,7 +12,6 @@ export class Particle {
     this.deselect()
   }
 
-  // lookup particle position at a specific time/tick
   at(time) {
     if (!this.parent) return this.startPos
     let pos = { ...this.parent.at(time) }
@@ -28,17 +27,43 @@ export class Particle {
 
   draw(ctx, time) {
     const pos = this.at(time)
+    let size = this.size * this.mass() ** 0.5
+    // if no parrent draw border
+    if (!this.parent) {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size)
+      size -= 2
+    }
     ctx.fillStyle = this.color
-    ctx.fillRect(pos.x - this.size/2, pos.y - this.size/2, this.size, this.size)
+    ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size)
   }
 
-  drawRadius(ctx, radius, time) {
+  drawPaused(ctx, time) {
+    // write the speed of the particle onto the particle
+    const pos = this.at(time)
+    const size = this.size * this.mass() ** 0.5
+    ctx.fillStyle = '#fff'
+    ctx.font = '12px sans-serif'
+    // write speed in scientific notation
+    let speed = this.rotationSpeed.toExponential(2)
+    // center the text bellow the particle
+    const textWidth = ctx.measureText(speed).width
+    ctx.fillText(speed, pos.x - textWidth/2, pos.y + size/2 + 12)
+  }
+
+  drawRadius(ctx, radius, time, lineColor) {
     const pos = this.at(time)
     ctx.beginPath()
     ctx.lineWidth = 1
-    ctx.strokeStyle = '#666'
+    ctx.strokeStyle = lineColor
     ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI)
     ctx.stroke()
+  }
+
+  mass() {
+    let mass = 1
+    this.children.forEach(child => mass += child.mass())
+    return mass
   }
 
   select() { this.color = '#f60' }

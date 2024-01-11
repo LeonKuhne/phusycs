@@ -19,7 +19,9 @@
   padding: 5px 2rem;
   display: flex;
   color: white;
-} #play, #download, #help {
+  user-select: none;
+  background: #000d;
+} #play, #download, #help, #trip {
   padding: 1rem; 
   cursor: pointer;
   font-size: 20px;
@@ -31,6 +33,10 @@
   content: "❚❚";
 } #play.paused::before {
   content: "►";
+} #download:active {
+  color: #66f;
+} #help.active {
+  color: var(--helpColor);
 } #line {
   flex: 1;
   height: 0;

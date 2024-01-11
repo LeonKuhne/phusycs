@@ -13,8 +13,10 @@ export class Phusycs {
     this.elapsed = 0
     this.pauseTime = 0
     this.particleSize = 20
-    this.trackLength = 2000 // in ms
+    this.trackLength = 3000 // in ms
     this.progress = 0
+    this.clearScreen = true
+    this.lineColor = '#666'
 
     this.audioEngine = new AudioEngine(this.trackLength)
     setInterval(() => this.draw(), 1000 / fps)
@@ -41,10 +43,16 @@ export class Phusycs {
 
     // draw particle & edges
     const time = this.elapsed
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-    this.particles.forEach(particle => particle.parent?.drawRadius(this.ctx, particle.radius, time))
+    if (this.clearScreen) this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    this.particles.forEach(particle => particle.parent?.drawRadius(this.ctx, particle.radius, time, this.lineColor))
     this.edges.forEach(edge => edge.draw(this.ctx, time))
     this.particles.forEach(particle => particle.draw(this.ctx, time))
+    if (this.paused) this.particles.forEach(particle => particle.drawPaused(this.ctx, time))
+  }
+
+  fillScreen(color) {
+    this.ctx.fillStyle = color
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
   }
 
   get paused() { return this.pauseTime !== 0 }
@@ -89,7 +97,7 @@ export class Phusycs {
   }
 
   addParticle(parent, x, y) {
-    const particle = new Particle(parent, x, y, this.particleSize, this.elapsed)
+    const particle = new Particle(parent, x, y, this.particleSize, this.elapsed, this.lineColor)
     this.particles.push(particle)
     return particle
   }
@@ -97,7 +105,9 @@ export class Phusycs {
   connect(from, to) {
     const edge = new Edge(from, to)
     // disconnect existing
-    const existing = this.edges.find(edge => edge.from === from && edge.to === to)
+    const existing = this.edges.find(edge => {
+      return edge.from === from && edge.to === to || edge.from === to && edge.to === from
+    })
     if (existing) {
       this.disconnect(existing)
       return null

@@ -3,6 +3,10 @@ import { Particle } from './particle.js'
 import { Edge } from './edge.js'
 
 function setup() {
+  const instructions = document.getElementById('instructions')
+  const helpButton = document.getElementById('help')
+  const tripButton = document.getElementById('trip')
+
   const phusycs = new Phusycs(120)
   const speedSensitivity = .001
   const scaleSensitivity = .01
@@ -24,6 +28,7 @@ function setup() {
 
   function select(...selection) {
     deselectAll()
+    selection = selection.filter(item => item != null)
     if (!selection.length) return
     for (const particle of selection) particle.select()
     selected = selection
@@ -39,8 +44,26 @@ function setup() {
   // trigger download
   document.getElementById('play').addEventListener('click', () => phusycs.togglePause())
   document.getElementById('download').addEventListener('click', () => phusycs.audioEngine.download(phusycs.edges))
-  document.getElementById('help').addEventListener('click', () => document.getElementById('instructions').classList.toggle('show'))
-  document.getElementById('instructions').addEventListener('click', () => document.getElementById('instructions').classList.remove('show'))
+  instructions.addEventListener('click', () => instructions.classList.remove('show'))
+
+  // toggle help menu
+  helpButton.addEventListener('click', () => {
+    instructions.classList.toggle('show')
+    helpButton.classList.toggle('active')
+  })
+
+  // toggle trippy mode
+  tripButton.addEventListener('click', () => {
+    phusycs.clearScreen = !phusycs.clearScreen
+    if (phusycs.clearScreen) {
+      tripButton.style.color = '#fff'
+      phusycs.lineColor = '#666'
+    } else {
+      tripButton.style.color = `hsl(${Math.random() * 360}, 35%, 50%)`
+      phusycs.lineColor = '#000'
+      phusycs.fillScreen('#666')
+    }
+  })
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
@@ -55,7 +78,13 @@ function setup() {
     }
 
     // filter particles
-    const selectedParticles = selected.filter(particle => particle instanceof Particle)
+    const selectedParticles = selected.reduce((acc, particleOrEdge) => {
+      if (particleOrEdge instanceof Edge) {
+        acc.push(particleOrEdge.from)
+        acc.push(particleOrEdge.to)
+      } else acc.push(particleOrEdge)
+      return acc
+    }, [])
     if (!selectedParticles.length) return
 
     // increase node tree radius
@@ -140,7 +169,7 @@ function setup() {
     }
 
     // drag roots
-    const roots = selected.filter(particle => !particle.parent)
+    const roots = selecting.filter(particle => !particle.parent)
     if (!roots.length) return
     const dragDelta = { x: dragEnd.x - dragFrom.x, y: dragEnd.y - dragFrom.y}
     for (const particle of roots) {
