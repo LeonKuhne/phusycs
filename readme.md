@@ -1,9 +1,12 @@
 ### todo
-- drag on empty to select multiple
-- add tutorial/instructions
 - show speeds of particles when paused
 - allow drag on orbiting particles to adjust orbit radius & angle
 - change timeline to slider and allow adjusting playhead
+- press 'r' to add random velocity to selected particles:w
+- press 'm' to mute edge
+- pick particle speed from beat (eg 1/4t), key/octave, or bar/beat
+- type in particle speed and angle
+- export audio
 
 ### controls
 - *drag particle* to move if static

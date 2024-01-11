@@ -12,7 +12,6 @@ function setup() {
   let dragEnd = null
   let dragging = false
 
-
   // 
   // helpers
 
@@ -33,12 +32,12 @@ function setup() {
     dragging = false
   }
 
-
   //
   // listeners
 
   // trigger download
   document.getElementById('download').addEventListener('click', () => phusycs.audioEngine.download(phusycs.edges))
+  document.getElementById('help').addEventListener('click', () => document.getElementById('instructions').classList.toggle('show'))
 
   // listen for scroll
   phusycs.canvas.addEventListener('wheel', e => {
@@ -96,6 +95,7 @@ function setup() {
   })
 
   phusycs.canvas.addEventListener('mousedown', e => {
+    // capture drag
     dragStart = { x: e.clientX, y: e.clientY }
     dragEnd = { x: e.clientX, y: e.clientY }
     const particle = phusycs.getClickedParticle(e.clientX, e.clientY)
@@ -106,6 +106,7 @@ function setup() {
   })
 
   phusycs.canvas.addEventListener('mousemove', e => {
+    // drag
     if (!dragStart) return
     const dragFrom = { ...dragEnd }
     dragEnd = { x: e.clientX, y: e.clientY }

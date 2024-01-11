@@ -14,19 +14,26 @@
   border-top: 1px solid #333;
   padding: 5px 2rem;
   display: flex;
-  gap: 2rem;
-} #play, #download {
+  color: white;
+} #help {
+  color: #fcc;
+} #play, #download, #help {
   padding: 1rem; 
   cursor: pointer;
+  font-size: 20px;
+  height: 1.75rem;
+  width: 1.75rem;
+  /* center text */
+  text-align: center;
 } #play::before {
   content: "►";
-  color: white;
-  font-size: 20px;
+} #play.paused::before {
+  content: "❚❚";
 } #line {
   flex: 1;
   height: 0;
   border: 1px solid #eee;
-  margin: auto;
+  margin: auto 1rem;
 } #playhead {
   border-radius: 50%;
   position: relative;
@@ -35,8 +42,22 @@
   width: 1rem;
   transform: translate(-50%, -50%);
   background: #fff;
-} #download::before {
-  content: "▼";
-  color: white;
-  font-size: 20px;
+} #instructions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  border: 1px solid #fcc;
+  border-radius: 1.5rem;
+  padding: 0.75rem 2.25rem;
+  opacity: 0;
+  display: none;
+  background: #000d;
+  color: #dcc;
+} .show {
+  animation: fadeOut 0.25s ease-in-out forwards;
+  opacity: 1;
+  display: block !important;
 }
+@keyframes fadeOut { 0% { opacity: 0; } 100% { opacity: 1; } }

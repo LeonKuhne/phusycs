@@ -4,6 +4,7 @@ import { AudioEngine } from './audio-engine.js'
 
 export class Phusycs {
   constructor(fps) {
+    this.playButton = document.getElementById('play')
     this.playhead = document.getElementById('playhead')
     this.canvas = document.getElementById('view')
     this.ctx = this.canvas.getContext('2d')
@@ -52,10 +53,12 @@ export class Phusycs {
     // stop
     if (!this.paused) {
       this.pauseTime = Date.now() 
+      this.playButton.classList.add('paused')
     // resume
     } else {
       this.startTime += Date.now() - this.pauseTime
       this.pauseTime = 0
+      this.playButton.classList.remove('paused')
     }
   }
 
