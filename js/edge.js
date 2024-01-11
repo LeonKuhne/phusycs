@@ -23,18 +23,26 @@ export class Edge {
   draw(ctx, time) {
     const startPos = this.from.at(time)
     const endPos = this.to.at(time)
+    // draw selected and solo/muted 
+    if (this.selected && (this.solo || this.muted)) {
+      Edge.drawLine(ctx, startPos, endPos, Edge.SIZE + 2, this.color())
+    }
+    Edge.drawLine(ctx, startPos, endPos, Edge.SIZE, this.selected ? Edge.SELECT_COLOR : this.color())
+  }
+
+  static drawLine(ctx, start, end, size, color=this.color()) {
     ctx.beginPath()
-    ctx.strokeStyle = this.selected ? this.color() : this.baseColor
-    ctx.lineWidth = Edge.SIZE
-    ctx.moveTo(startPos.x, startPos.y)
-    ctx.lineTo(endPos.x, endPos.y)
+    ctx.strokeStyle = color
+    ctx.lineWidth = size
+    ctx.moveTo(start.x, start.y)
+    ctx.lineTo(end.x, end.y)
     ctx.stroke()
   }
 
   color() {
     if (this.solo) return Edge.SOLO_COLOR
     if (this.muted) return Edge.MUTE_COLOR
-    return Edge.SELECT_COLOR
+    return this.baseColor
   }
 
   distanceFrom(x, y, time) {

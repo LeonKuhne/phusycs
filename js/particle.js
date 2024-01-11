@@ -1,15 +1,25 @@
 export class Particle {
   constructor(parent, x, y, size, timestep) {
-    if (parent) parent.children.push(this)
-    this.parent = parent
+    this.parent = null
     this.children = []
     this.startPos = { x, y }
-    this.radius = parent ? Particle.distanceBetween(parent.at(timestep), this.startPos) : null;
-    this.angle = parent ? Particle.angleBetween(parent.at(timestep), this.startPos) : null;
     this.size = size
     this.rotationSpeed = 0
     this.startTime = timestep
     this.deselect()
+    if (parent) this.setParent(parent, timestep)
+  }
+
+  setParent(parent, timestep) {
+    if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this)
+    this.parent = parent
+    parent.children.push(this)
+    this.radius = parent ? Particle.distanceBetween(parent.at(timestep), this.startPos) : null;
+    this.angle = parent ? Particle.angleBetween(parent.at(timestep), this.startPos) : null;
+  }
+
+  removeChild(child) {
+    this.children = this.children.filter(c => c !== child)
   }
 
   at(time) {

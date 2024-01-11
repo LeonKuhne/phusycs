@@ -22,8 +22,10 @@
   <div id="instructions">
     <h3>CONTROLS</h3>
     <div><strong>click</strong> - add new particles</div>
+    <div><strong>right click</strong> - create parent and connect selected</div>
     <div><strong>click while selected</strong> - place particle in orbit around target</div>
     <div><strong>click particle</strong> - select</div>
+    <div><strong>shift</strong> - slowmo, speed/scale inputs are amplified</div>
     <div><strong>shift + drag/click particle</strong> - select additional particles</div>
     <div><strong>drag</strong> - select in range</div>
     <div><strong>drag particle</strong> - move if static</div>
@@ -37,7 +39,11 @@
     <div><strong>'a'</strong> - select all</div>
     <div><strong>'c', 'd'</strong> - connect/disconnect edges between selected particles</div>
     <div><strong>'m', 's'</strong> - mute/solo selected edge</div>
-    <div><strong>'=', '+', '-', '/', '*', '^' + equation</strong> - adjust speed, use '#' to reference orbit depth</div>
+    <div><strong>'r'</strong> - adjust selected speeds randomly</div>
+    <div><strong>'=+-/*^'</strong> - open math menu</div>
+    <h3>MATH MENU</h3>
+    <div><strong>'#'</strong> reference orbit depth</div>
+    <div><strong>'r'</strong> assign unique random value (0-1) for selected</div>
   </div>
   <input id="math-menu"></input>
 </body>

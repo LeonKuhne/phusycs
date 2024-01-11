@@ -3,7 +3,6 @@
 - add timescale to view (put dropdown on timeline)
 - allow drag on orbiting particles to adjust orbit radius & angle
 - buffer clips like normal to allow longer playback
-- press 'r' to add random velocity to selected particles:w
 - change timeline to slider and allow adjusting playhead
 - export audio
 - test lazy loading particle.at or consider refactoring draw particle mechanism

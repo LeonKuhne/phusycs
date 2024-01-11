@@ -6,9 +6,11 @@ export class MathMenu {
     this.elem = elem
     this.operators = ['=', '+', '-', '*', '/', '^']
     this.special = {
-      '#': particle => particle.depth()
+      '#': particle => particle.depth(),
+      'r': _ => Math.random()
     }
     this.methods = [
+      this.tryMinus,
       this.tryOperator,
       this.tryDecimal,
       this.tryNumber,
@@ -121,6 +123,14 @@ export class MathMenu {
     if (this.isSpecial(next)) {
       if (this.operators.includes(prev)) return this.equation + next
     }
+  }
+
+  tryMinus(prev, next) {
+    if (next === '-') {
+      // only allow after operators that arent + or -
+      if (this.operators.includes(prev) && prev !== '+' && prev !== '-') return this.equation + next
+    }
+    return null
   }
 
   isSpecial(entry) {

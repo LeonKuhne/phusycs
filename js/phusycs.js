@@ -16,6 +16,7 @@ export class Phusycs {
     this.trackLength = 3000 // in ms
     this.progress = 0
     this.clearScreen = true
+    this.slowmo = 1 
     this.lineColor = '#666'
     this.audioEngine = new AudioEngine(this.trackLength)
     setInterval(() => this.draw(), 1000 / fps)
@@ -124,6 +125,7 @@ export class Phusycs {
       const toRemove = particleOrEdge.allChildren().concat(particleOrEdge)
       this.particles = this.particles.filter(particle => !toRemove.includes(particle))
       this.edges = this.edges.filter(edge => !toRemove.includes(edge.from) && !toRemove.includes(edge.to))
+      toRemove.forEach(particle => particle.parent?.removeChild(particle))
       return
     }
     this.disconnectPath(particleOrEdge.from, particleOrEdge.to)
@@ -147,7 +149,7 @@ export class Phusycs {
 
   stepTime() { 
     if (this.paused) return this.elapsed
-    this.elapsed = (Date.now() - this.startTime)
+    this.elapsed = (Date.now() - this.startTime) * this.slowmo
   } 
 
   accelParticle(particle, amount) {

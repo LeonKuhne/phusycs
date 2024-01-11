@@ -10,16 +10,20 @@ function setup() {
   const mathMenu = new MathMenu(document.getElementById('math-menu'))
 
   const phusycs = new Phusycs(60)
-  const speedSensitivity = .0001
+  const speedSensitivity = .0005
   const scaleSensitivity = .01
   const scrollThreshold = 1
   const minDragDistance = 20
+  const randomizeAmount = .01
 
   let selected = []
   let selecting = []
   let dragStart = null
   let dragEnd = null
   let dragging = false
+  let shiftSpeed = 100
+  let shiftScale = 5
+  let slowSpeed = 0.01
 
   // 
   // helpers
@@ -51,6 +55,22 @@ function setup() {
         addIfMissing(particleOrEdge.from)
         addIfMissing(particleOrEdge.to)
       } else addIfMissing(particleOrEdge)
+      return acc
+    }, [])
+  }
+
+  function connectedEdges() {
+    return selected.reduce((acc, particleOrEdge) => {
+      const addIfMissing = edge => {
+        const exists = acc.find(item => phusycs.equalsEdgePath(item, edge.from, edge.to))
+        if (!exists) acc.push(edge)
+      }
+      if (particleOrEdge instanceof Edge) addIfMissing(particleOrEdge)
+      else {
+        for (const edge of phusycs.edges) {
+          if (edge.from === particleOrEdge || edge.to === particleOrEdge) addIfMissing(edge)
+        }
+      }
       return acc
     }, [])
   }
@@ -91,7 +111,8 @@ function setup() {
     // adjust radii
     if (!selected.length) {
       // increase all radii
-      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
+      const scale = (e.shiftKey ? scaleSensitivity * shiftScale : scaleSensitivity)
+      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scale
       phusycs.scaleRadii(amount)
       return
     }
@@ -103,20 +124,23 @@ function setup() {
     // increase node tree radius
     const roots = selectedParticles.filter(particle => !particle.parent)
     if (roots.length) {
-      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
+      const scale = (e.shiftKey ? scaleSensitivity * shiftScale : scaleSensitivity)
+      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scale
       for (const root of roots) phusycs.scaleRoot(root, amount)
       return
     }
 
     // adjust radius on paused
     if (phusycs.paused) {
-      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scaleSensitivity
+      const scale = (e.shiftKey ? scaleSensitivity * shiftScale : scaleSensitivity)
+      const amount = 1 + (e.deltaY < 0 ? 1 : -1) * scale
       for (const particle of selectedParticles) particle.radius *= amount
       return
     }
 
     // adjust speed
-    const amount = speedSensitivity * (e.deltaY < 0 ? 1 : -1)
+    const speed = (e.shiftKey ? speedSensitivity * shiftSpeed : speedSensitivity)
+    const amount = speed * (e.deltaY < 0 ? 1 : -1)
     for (const particle of selectedParticles) phusycs.accelParticle(particle, amount)
   })
 
@@ -125,6 +149,10 @@ function setup() {
   
   window.addEventListener('keydown', e => {
     switch(e.key) {
+      // slowmo
+      case 'Shift':
+        phusycs.slowmo = slowSpeed
+        break;
       // delete selected 
       case 'Backspace':
         if (mathMenu.visible) return
@@ -143,14 +171,15 @@ function setup() {
         break
       // mute selected
       case 'm':
-        for (const edge of selected.filter(edge => edge instanceof Edge)) {
+        for (const edge of connectedEdges()) {
+          console.log("muted edge")
           edge.muted = !edge.muted
           if (edge.muted) edge.solo = false
         }
         break
       // solo selected
       case 's':
-        for (const edge of selected.filter(edge => edge instanceof Edge)) {
+        for (const edge of connectedEdges()) {
           edge.solo = !edge.solo
           if (edge.solo) edge.muted = false 
         }
@@ -158,9 +187,9 @@ function setup() {
       case 'a':
         select(...phusycs.particles)
         break
+      // connect selected particles
       case 'c':
         if (selected.length < 2) return
-        // connect selected particles
         const selectedParticles = connectedParticles(selected)
         for (const from of selectedParticles) {
           for (const to of selectedParticles) {
@@ -169,8 +198,8 @@ function setup() {
           }
         }
         break
+      // disconnect edges between selected particles
       case 'd':
-        // disconnect edges between selected particles
         for (const from of connectedParticles()) {
           for (const to of connectedParticles()) {
             if (from === to) continue
@@ -178,6 +207,19 @@ function setup() {
           }
         }
         break
+      // randomize selected particles
+      case 'r':
+      case 'R':
+        if (mathMenu.visible) return
+        let amount = randomizeAmount
+        if (e.shiftKey) amount *= shiftSpeed
+        console.log(amount)
+        for (const particle of connectedParticles()) {
+          particle.rotationSpeed += (Math.random() * 2 - 1) * amount
+        }
+        break;
+
+      // toggle math menu
       case '=':
       case '+':
       case '-':
@@ -194,6 +236,14 @@ function setup() {
         mathMenu.hide()
         for (const particle of connectedParticles()) mathMenu.applyMath(particle)
         break;
+    }
+  })
+
+  window.addEventListener('keyup', e => {
+    switch(e.key) {
+      case 'Shift':
+        phusycs.slowmo = 1
+        break
     }
   })
 
@@ -253,9 +303,19 @@ function setup() {
   phusycs.canvas.addEventListener('mouseup', e => { 
     // add particle
     const dragDistance = Particle.distanceBetween(dragStart, dragEnd)
+    const particles = selected.filter(entry => entry instanceof Particle)
     if (!selecting.length && dragDistance < minDragDistance) {
-      parent = selected[0] instanceof Particle ? selected[0] : null
-      const particle = phusycs.addParticle(parent, e.clientX, e.clientY)
+      // connect selected to new head
+      if (e.button === 2) { 
+        const particle = phusycs.addParticle(null, e.clientX, e.clientY)
+        for (const target of particles) target.setParent(particle, phusycs.elapsed)
+        select(particle)
+        return
+      } 
+      if (particles.length > 1) return
+      // add orbiting particle
+      const target = particles?.[0] || null
+      const particle = phusycs.addParticle(target, e.clientX, e.clientY)
       select(particle)
       return;
     }
@@ -269,6 +329,9 @@ function setup() {
     }
     select(...selecting)
   })
+
+  // disable context menu
+  phusycs.canvas.addEventListener('contextmenu', e => e.preventDefault())
 
   // resize canvas
   window.addEventListener('resize', () => {
