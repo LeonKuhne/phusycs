@@ -33,13 +33,13 @@ function setup() {
   function select(...selection) {
     deselectAll()
     selection = selection.filter(item => item != null)
-    if (!selection.length) return
     for (const particle of selection) particle.select()
     selected = selection
     selection = []
     dragStart = null
     dragEnd = null
     dragging = false
+    phusycs.stopDraw('selection-box')
   }
 
   function connectedParticles() {
@@ -220,10 +220,11 @@ function setup() {
     if (!dragging) {
       selecting = phusycs.inBox(dragStart, dragEnd)
       // draw selection box
-      const ctx = phusycs.canvas.getContext('2d')
-      ctx.strokeStyle = '#666'
-      ctx.lineWidth = 1
-      ctx.strokeRect(dragStart.x, dragStart.y, e.clientX - dragStart.x, e.clientY - dragStart.y)
+      phusycs.onDraw('selection-box', (ctx) => {
+        ctx.strokeStyle = '#666'
+        ctx.lineWidth = 1
+        ctx.strokeRect(dragStart.x, dragStart.y, e.clientX - dragStart.x, e.clientY - dragStart.y)
+      })
       return
     }
 

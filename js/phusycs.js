@@ -20,6 +20,7 @@ export class Phusycs {
     this.audioEngine = new AudioEngine(this.trackLength)
     setInterval(() => this.draw(), 1000 / fps)
     this.startTime = Date.now()
+    this.drawCallbacks = {}
   }
 
   draw() {
@@ -45,7 +46,12 @@ export class Phusycs {
     this.edges.forEach(edge => edge.draw(this.ctx, time))
     this.particles.forEach(particle => particle.draw(this.ctx, time))
     if (this.paused) this.particles.forEach(particle => particle.drawPaused(this.ctx, time))
+    // remaining draw callbacks
+    Object.values(this.drawCallbacks).forEach(callback => callback(this.ctx))
   }
+
+  onDraw(name, callback) { this.drawCallbacks[name] = callback }
+  stopDraw(name) { delete this.drawCallbacks[name] }
 
   fillScreen(color) {
     this.ctx.fillStyle = color

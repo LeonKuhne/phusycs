@@ -1,5 +1,6 @@
 ### todo
-- adjust particle speed with math
+- add panning controls
+- add mobile friendly controls (similar to vr, eg swipe to speed up, slow down)
 - add timescale to view (put dropdown on timeline)
 - allow drag on orbiting particles to adjust orbit radius & angle
 - buffer clips like normal to allow longer playback
