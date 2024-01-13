@@ -297,6 +297,12 @@ function setup() {
     // drag roots
     const roots = selecting.filter(particle => particle instanceof Particle && !particle.parent)
     if (!roots.length) return
+    // add selected roots
+    for (const particle of selected) {
+      if (particle instanceof Particle && !particle.parent) {
+        if (!roots.includes(particle)) roots.push(particle)
+      }
+    }
     const dragDelta = { x: dragEnd.x - dragFrom.x, y: dragEnd.y - dragFrom.y}
     for (const particle of roots) {
       particle.startPos.x += dragDelta.x
