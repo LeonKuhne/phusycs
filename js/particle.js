@@ -3,7 +3,7 @@ export class Particle {
     this.parent = null
     this.children = []
     this.startPos = { x, y }
-    this.size = size
+    this.startSize = size
     this.rotationSpeed = 0
     this.startTime = timestep
     this.deselect()
@@ -35,10 +35,14 @@ export class Particle {
     return (time - this.startTime) * this.rotationSpeed
   }
 
+  size() {
+    return this.startSize * this.mass() ** 0.5
+  }
+
   draw(ctx, time) {
     const pos = this.at(time)
-    let size = this.size * this.mass() ** 0.5
     // if no parrent draw border
+    let size = this.size()
     if (!this.parent) {
       ctx.fillStyle = '#fff'
       ctx.beginPath()

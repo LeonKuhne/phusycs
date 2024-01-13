@@ -82,11 +82,11 @@ export class Phusycs {
   }
 
   getClickedParticle(x, y) {
-    let minDistance = this.particleSize
+    let minDistance = Infinity
     let closestParticle = null
     for (const particle of this.particles) {
       const distance = particle.distanceFrom(x, y, this.elapsed)
-      if (distance < minDistance) {
+      if (distance < minDistance && distance < particle.size()/2) {
         minDistance = distance
         closestParticle = particle
       }
