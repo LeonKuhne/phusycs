@@ -46,9 +46,9 @@ export class Phusycs {
     this.particles.forEach(particle => particle.parent?.drawRadius(this.ctx, particle.radius, time, this.lineColor))
     this.edges.forEach(edge => edge.draw(this.ctx, time))
     this.particles.forEach(particle => particle.draw(this.ctx, time))
-    if (this.paused) this.particles.forEach(particle => particle.drawPaused(this.ctx, time))
     // remaining draw callbacks
     Object.values(this.drawCallbacks).forEach(callback => callback(this.ctx))
+    if (this.paused) this.particles.forEach(particle => particle.drawPaused(this.ctx, time))
   }
 
   onDraw(name, callback) { this.drawCallbacks[name] = callback }

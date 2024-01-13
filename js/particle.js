@@ -59,14 +59,14 @@ export class Particle {
   drawPaused(ctx, time) {
     // write the speed of the particle onto the particle
     const pos = this.at(time)
-    const size = this.size * this.mass() ** 0.5
+    const size = this.size()
     ctx.fillStyle = '#fff'
     ctx.font = '12px sans-serif'
     // write speed in scientific notation
     let speed = this.rotationSpeed.toExponential(2)
     // center the text bellow the particle
     const textWidth = ctx.measureText(speed).width
-    ctx.fillText(speed, pos.x - textWidth/2, pos.y + size/2 + 12)
+    ctx.fillText(`${speed}`, pos.x - textWidth/2, pos.y + size/2 + 12)
   }
 
   drawRadius(ctx, radius, time, lineColor) {
