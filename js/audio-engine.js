@@ -16,7 +16,7 @@ export class AudioEngine {
 
   readPlayhead(edges) {
     // filter out muted
-    edges = edges.filter(edge => !edge.muted && !edge.solo)
+    edges = edges.filter(edge => !edge.muted)
     // select solo'd edges
     const solo = edges.filter(edge => edge.solo)
     if (solo.length) edges = solo
